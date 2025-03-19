@@ -121,7 +121,7 @@ let HeaderPage = () => {
     <>
       <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Juego de tres en linea</a>
+          <a class="navbar-brand" href="https://github.com/josedev99/juego-tres-en-linea">Juego de tres en linea (github)</a>
         </div>
       </nav>
     </>
