@@ -1,6 +1,6 @@
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 let Square = ({ value, onSquareClick }) => {
   return (
@@ -19,6 +19,7 @@ let Board = ({ xIsNext, squares, onPlay, jumpTo }) => {
     if (xIsNext) {
       nextSquares[i] = 'X';
     } else {
+
       nextSquares[i] = 'O';
     }
     onPlay(nextSquares);
@@ -69,11 +70,41 @@ let Game = () => {
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
   const [activeMov, setActiveMov] = useState('');
+  const [mode, setMode] = useState("unicoj"); // Estado para el modo de juego
+  const [isAITurn, setIsAITurn] = useState(false);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    if (mode === "unicoj") {
+      setIsAITurn(true);
+    }
+  }
+
+  useEffect(() => {
+    if (isAITurn) {
+      setTimeout(() => {
+        handleAIPlay(history[currentMove]);
+        setIsAITurn(false);  //turno jugador
+      }, 500);
+    }
+  }, [isAITurn, currentMove, history]);
+
+  function handleAIPlay(squares) {
+    console.log(squares);
+  
+    const emptySquares = squares
+      .map((val, idx) => (val === null ? idx : null))
+      .filter((val) => val !== null);
+  
+    if (emptySquares.length === 0) return;
+  
+    const randomIndex = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+    const nextSquares = squares.slice();
+    nextSquares[randomIndex] = 'O';
+  
+    handlePlay(nextSquares);
   }
 
   function jumpTo(nextMove) {
@@ -101,6 +132,7 @@ let Game = () => {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} jumpTo={jumpTo} />
       </div>
       <div className="col-sm-12 col-md-6">
+        <RadioButtons setMode={setMode} mode={mode} />
         <ol className='p-0 my-2'>{moves}</ol>
       </div>
     </div>
@@ -148,11 +180,26 @@ let HeaderPage = () => {
   );
 }
 
+function RadioButtons({ setMode, mode }) {
+  return (
+    <div>
+      <div className="radio icheck-turquoise d-inline mx-2">
+        <input type="radio" id="unicoj" name="optionJugador" value="unicoj" checked={mode === "unicoj"} onChange={() => setMode("unicoj")} />
+        <label htmlFor="unicoj">Un jugador</label>
+      </div>
+      <div className="radio icheck-turquoise d-inline">
+        <input type="radio" id="multij" name="optionJugador" value="multij" checked={mode === "multij"} onChange={() => setMode("multij")} />
+        <label htmlFor="multij">Multijugador</label>
+      </div>
+    </div>
+  );
+}
+
 let Card = ({ title, children }) => {
   return (
     <>
       <div className="card col-sm-12 col-md-6">
-        <div className="card-header p-1">
+        <div className="card-header p-1 text-center">
           <h4>{title}</h4>
         </div>
         <div className="card-body p-1">
