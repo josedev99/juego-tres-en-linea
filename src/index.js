@@ -10,7 +10,7 @@ let Square = ({ value, onSquareClick }) => {
   );
 }
 
-let Board = ({ xIsNext, squares, onPlay }) => {
+let Board = ({ xIsNext, squares, onPlay, jumpTo }) => {
   function handleClick(i) {
     if (calculateWinner(squares) || squares[i]) {
       return;
@@ -28,12 +28,21 @@ let Board = ({ xIsNext, squares, onPlay }) => {
   let status;
   if (winner) {
     status = 'Ganador: ' + winner;
+    Swal.fire({
+      title: `🎉 ¡Felicidades, ${winner}! 🎉`,
+      text: "Has sido seleccionado como el ganador.",
+      icon: "success",
+      confirmButtonText: "Aceptar"
+    });
   } else {
     status = 'Siguiente jugador: ' + (xIsNext ? 'X' : 'O');
   }
+  const resetGame = ()=>{
+    jumpTo(0);
+  }
   return (
     <>
-      <div className="status"><span class="badge rounded-pill text-bg-light">{status}</span></div>
+      <div className="status"><span className="badge rounded-pill text-bg-light">{status}</span></div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -49,6 +58,7 @@ let Board = ({ xIsNext, squares, onPlay }) => {
         <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
         <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
       </div>
+      <Button title={'Reiniciar'} resetGame={resetGame} className={'btn btn-outline-success m-2 btn-sm bordered-0'} icon={"bi bi-arrow-clockwise"} />
     </>
   );
 }
@@ -58,7 +68,7 @@ let Game = () => {
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
-  const [activeMov,setActiveMov] = useState('');
+  const [activeMov, setActiveMov] = useState('');
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -67,6 +77,7 @@ let Game = () => {
   }
 
   function jumpTo(nextMove) {
+    console.log(nextMove)
     setCurrentMove(nextMove);
   }
 
@@ -78,7 +89,7 @@ let Game = () => {
       description = 'Ir al inicio del juego';
     }
     return (
-      <li key={move} className='list-group list-group-flush' style={{fontSize: "font-size: 14px"}}>
+      <li key={move} className='list-group list-group-flush' style={{ fontSize: "font-size: 14px" }}>
         <button className='list-group-item list-group-item-action text-center' onClick={() => jumpTo(move)}>{description}</button>
       </li>
     );
@@ -87,12 +98,20 @@ let Game = () => {
   return (
     <div className="row">
       <div className="col-sm-12 col-md-6 d-flex justify-content-start flex-column align-items-center">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} jumpTo={jumpTo} />
       </div>
       <div className="col-sm-12 col-md-6">
         <ol className='p-0 my-2'>{moves}</ol>
       </div>
     </div>
+  );
+}
+
+const Button = ({ title, className, icon, resetGame }) => {
+  return (
+    <>
+      <button className={className} onClick={resetGame} style={{border: 'none'}}><i className={icon}></i> {title}</button>
+    </>
   );
 }
 
@@ -110,6 +129,7 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      console.log(squares[a]);
       return squares[a];
     }
   }
@@ -119,24 +139,24 @@ function calculateWinner(squares) {
 let HeaderPage = () => {
   return (
     <>
-      <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="https://github.com/josedev99/juego-tres-en-linea">Juego de tres en linea (github)</a>
+      <nav className="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div className="container">
+          <a className="navbar-brand" target='_blank' title='Descargar código fuente' href="https://github.com/josedev99/juego-tres-en-linea"><i className="bi bi-github"></i></a>
         </div>
       </nav>
     </>
   );
 }
 
-let Card = ({title,children}) => {
+let Card = ({ title, children }) => {
   return (
     <>
-      <div class="card col-sm-12 col-md-6">
-        <div class="card-header p-1">
-            <h4>{title}</h4>
+      <div className="card col-sm-12 col-md-6">
+        <div className="card-header p-1">
+          <h4>{title}</h4>
         </div>
-        <div class="card-body p-1">
-              {children}
+        <div className="card-body p-1">
+          {children}
         </div>
       </div>
     </>

@@ -60,10 +60,12 @@ ul {
     text-align: center;
     width: 50px;
     transition: .2 ease-in-out;
+    border-radius: 6px;
 }
 
 .square:hover{
     transform: scale(1.1,1.1);
+    background: #d9e7fa;
 }
 
 .board-row:after {
